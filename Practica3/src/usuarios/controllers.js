@@ -63,43 +63,35 @@ export function viewAdd(req, res) {
 }
 
 export function doLogin(req, res) {
-    //No valen campos vacíos
     const validations = [
         body('username', 'El nombre de usuario es obligatorio').notEmpty(),
         body('password', 'La contraseña es obligatoria').notEmpty(),
     ];
 
-    //Validaciones
     Promise.all(validations.map(validation => validation.run(req))).then(() => {
         const errors = validationResult(req);
-        //Si hay error devolverlo al usuario (errores tiene algo dentro)
         if (!errors.isEmpty()) {
             return res.render('pagina', {
                 contenido: 'paginas/login',
-                //Mostrar los errores que haya
                 error: errors.array().map(err => err.msg).join('. '), 
             });
         }
 
-        //Capturar username y password
         const username = req.body.username.trim();
         const password = req.body.password.trim();
 
         try {
-            //Verificamos si el usuario existe y si la contraseña es la correcta
             const usuario = Usuario.login(username, password);
             req.session.login = true;
             req.session.nombre = usuario.nombre;
             req.session.esAdmin = usuario.rol === RolesEnum.ADMIN;
 
-            //Renderiza la página por login true
             return res.render('pagina', {
                 contenido: 'paginas/home',
                 session: req.session,
             });
 
         } catch (e) {
-            //Error de usuario o contraseña, renderiza
             return res.render('pagina', {
                 contenido: 'paginas/login',
                 error: 'El usuario o contraseña no son válidos',
@@ -141,7 +133,6 @@ export function aniadirUsuario(req, res) {
         });
 
     } catch (e) {
-        // Si ocurre algún error al crear el usuario
         return res.render('pagina', {
             contenido: 'paginas/aniadirUsuario',
             error: 'Error al añadir el usuario: ' + e.message
