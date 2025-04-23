@@ -251,3 +251,62 @@ export function doModify(req, res) {
         });
     }
 }
+
+export function viewGestionarCuenta(req, res){
+    console.log('Contenido de la sesión:', req.session);
+
+    res.render('pagina', {
+        contenido: 'paginas/gestionarCuenta',
+        session: req.session
+    });
+}
+
+export function viewActualizarCuenta(req, res) {
+    const { username, password, nombre, email } = req.body;
+
+    console.log('Contenido de la sesion:', req.session);
+    try {
+        const usuario = Usuario.getUsuarioByUsername(req.session.usuario.username);
+        if (!usuario) {
+            throw new Error('Usuario no encontrado.');
+        }
+
+        //Verificar si el nuevo username ya se usa
+        if (username && username !== usuario.username) {
+            const usuarioExistente = Usuario.getUsuarioByUsername(username);
+            if (usuarioExistente) {
+                throw new Error('El nombre de usuario ya está en uso. Por favor, elige otro.');
+            }
+            usuario.username = username;
+            req.session.usuario.username = username;
+        }
+
+        if (nombre) {
+            usuario.nombre = nombre;
+            req.session.usuario.nombre = nombre; 
+        }
+
+        if (email) {
+            usuario.email = email;
+            req.session.usuario.email = email;
+        }
+
+        if (password) {
+            usuario.password = password;
+        }
+
+        usuario.persist();
+
+        res.render('pagina', {
+            contenido: 'paginas/gestionarCuenta',
+            mensaje: 'Datos actualizados correctamente.',
+            session: req.session
+        });
+    } catch (error) {
+        res.render('pagina', {
+            contenido: 'paginas/gestionarCuenta',
+            mensaje: `Error al actualizar los datos: ${error.message}`,
+            session: req.session
+        });
+    }
+}
