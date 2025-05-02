@@ -51,43 +51,39 @@ export function viewAdd(req, res) {
 }
 
 export function doLogin(req, res) {
-    //No valen campos vacíos
     const validations = [
         body('username', 'El nombre de usuario es obligatorio').notEmpty(),
         body('password', 'La contraseña es obligatoria').notEmpty(),
     ];
 
-    //Validaciones
     Promise.all(validations.map(validation => validation.run(req))).then(() => {
         const errors = validationResult(req);
-        //Si hay error devolverlo al usuario (errores tiene algo dentro)
         if (!errors.isEmpty()) {
             return res.render('pagina', {
                 contenido: 'paginas/login',
-                //Mostrar los errores que haya
                 error: errors.array().map(err => err.msg).join('. '), 
             });
         }
 
-        //Capturar username y password
         const username = req.body.username.trim();
         const password = req.body.password.trim();
 
         try {
-            //Verificamos si el usuario existe y si la contraseña es la correcta
             const usuario = Usuario.login(username, password);
+
             req.session.login = true;
-            req.session.nombre = usuario.nombre;
+            req.session.nombre = usuario.nombre; 
+            req.session.username = usuario.username;
             req.session.esAdmin = usuario.rol === RolesEnum.ADMIN;
 
-            //Renderiza la página por login true
+            console.log('Sesión después del login:', req.session);
+
             return res.render('pagina', {
                 contenido: 'paginas/home',
                 session: req.session,
             });
 
         } catch (e) {
-            //Error de usuario o contraseña, renderiza
             return res.render('pagina', {
                 contenido: 'paginas/login',
                 error: 'El usuario o contraseña no son válidos',
@@ -252,26 +248,45 @@ export function doModify(req, res) {
     }
 }
 
-export function viewGestionarCuenta(req, res){
+export function viewGestionarCuenta(req, res) {
     console.log('Contenido de la sesión:', req.session);
 
-    res.render('pagina', {
-        contenido: 'paginas/gestionarCuenta',
-        session: req.session
-    });
+    try {
+        const username = req.session.usuario?.username;
+        if (!username) {
+            throw new Error('No se encontró el usuario en la sesión.');
+        }
+
+        const usuario = Usuario.getUsuarioByUsername(username);
+        if (!usuario) {
+            throw new Error('Usuario no encontrado en la base de datos.');
+        }
+
+        res.render('pagina', {
+            contenido: 'paginas/gestionarCuenta',
+            usuario,
+            session: req.session,
+            mensaje: null 
+        });
+    } catch (error) {
+        res.render('pagina', {
+            contenido: 'paginas/gestionarCuenta',
+            usuario: null,
+            session: req.session,
+            mensaje: error.message
+        });
+    }
 }
 
 export function viewActualizarCuenta(req, res) {
     const { username, password, nombre, email } = req.body;
 
-    console.log('Contenido de la sesion:', req.session);
     try {
         const usuario = Usuario.getUsuarioByUsername(req.session.usuario.username);
         if (!usuario) {
             throw new Error('Usuario no encontrado.');
         }
 
-        //Verificar si el nuevo username ya se usa
         if (username && username !== usuario.username) {
             const usuarioExistente = Usuario.getUsuarioByUsername(username);
             if (usuarioExistente) {
@@ -288,7 +303,6 @@ export function viewActualizarCuenta(req, res) {
 
         if (email) {
             usuario.email = email;
-            req.session.usuario.email = email;
         }
 
         if (password) {
@@ -307,6 +321,38 @@ export function viewActualizarCuenta(req, res) {
             contenido: 'paginas/gestionarCuenta',
             mensaje: `Error al actualizar los datos: ${error.message}`,
             session: req.session
+        });
+    }
+}
+
+export function viewDatosUsuario(req, res) {
+    //console.log('Contenido de la sesión:', req.session);
+
+    try {
+        const username = req.session.username;
+        if (!username) {
+            throw new Error('No se encontró el username en la sesión.');
+        }
+
+        const usuario = Usuario.getUsuarioByUsername(username);
+        //console.log('Datos obtenidos del usuario:', usuario);
+
+        if (!usuario) {
+            throw new Error('Usuario no encontrado en la base de datos.');
+        }
+
+        res.render('pagina', {
+            contenido: 'paginas/datosUsuario',
+            usuario,
+            session: req.session,
+            mensaje: null
+        });
+    } catch (error) {
+        res.render('pagina', {
+            contenido: 'paginas/datosUsuario',
+            usuario: null,
+            session: req.session,
+            mensaje: error.message
         });
     }
 }

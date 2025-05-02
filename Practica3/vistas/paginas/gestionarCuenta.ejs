@@ -1,4 +1,9 @@
 <h2>Gestionar Datos de la Cuenta</h2>
+
+<% if (locals.mensaje) { %>
+    <p><strong><%= locals.mensaje %></strong></p>
+<% } %>
+
 <p>Rellena solo los campos que deseas cambiar.</p>
 
 <form action="/usuarios/actualizarCuenta" method="POST">

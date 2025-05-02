@@ -44,11 +44,14 @@ export class Usuario {
 
     static getUsuarioByUsername(username) {
         const usuario = this.#getByUsernameStmt.get({ username });
+
+        //console.log('Datos obtenidos de la base de datos:', usuario);
+
         if (usuario === undefined) throw new UsuarioNoEncontrado(username);
 
-        const { password, rol, nombre, id } = usuario;
+        const { password, rol, nombre, id, email } = usuario;
 
-        return new Usuario(username, password, nombre, rol, id);
+        return new Usuario(username, password, nombre, rol, id, email);
     }
 
     static #insert(usuario) {
@@ -119,9 +122,17 @@ export class Usuario {
         return this.#id;
     }
 
+    get password() {
+        return this.#password;
+    }
+
     set password(nuevoPassword) {
         // XXX: En el ej3 / P3 lo cambiaremos para usar async / await o Promises
         this.#password = bcrypt.hashSync(nuevoPassword);
+    }
+
+    get email() {
+        return this.#email;
     }
 
     get username() {

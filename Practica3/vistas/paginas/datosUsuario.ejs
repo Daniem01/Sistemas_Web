@@ -1,0 +1,25 @@
+<h2>Datos de tu cuenta</h2>
+
+<% if (mensaje) { %>
+    <strong><%= mensaje %></strong></p>
+<% } %>
+
+<div>
+    <label for="username">Nombre de usuario:</label>
+    <input type="text" id="username" name="username" value="<%= usuario.username %>" readonly>
+</div>
+
+<div>
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" value="<%= usuario.nombre %>" readonly>
+</div>
+
+<div>
+    <label for="email">Correo electrónico:</label>
+    <input type="email" id="email" name="email" value="<%= usuario.email %>" readonly>
+</div>
+
+<div>
+    <a href="/usuarios/gestionarCuenta" class="btn btn-gestionar-administrar">Gestionar datos cuenta</a>
+    <a href="/usuarios/cambiarContrasena" class="btn btn-gestionar-administrar">Cambiar contraseña</a>
+</div>
