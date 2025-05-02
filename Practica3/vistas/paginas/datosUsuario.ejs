@@ -1,25 +1,49 @@
 <h2>Datos de tu cuenta</h2>
+<p>Modifique los campos que quiera cambiar y si desea cambiar la contraseña introduzca una nueva.</p>
 
 <% if (mensaje) { %>
-    <strong><%= mensaje %></strong></p>
+    <p><strong><%= mensaje %></strong></p>
 <% } %>
 
-<div>
-    <label for="username">Nombre de usuario:</label>
-    <input type="text" id="username" name="username" value="<%= usuario.username %>" readonly>
-</div>
+<form action="/usuarios/actualizarCuenta" method="POST" onsubmit="return validarContrasenas()">
+    <div>
+        <label for="username">Nombre de usuario:</label>
+        <input type="text" id="username" name="username" value="<%= usuario.username %>">
+    </div>
 
-<div>
-    <label for="nombre">Nombre:</label>
-    <input type="text" id="nombre" name="nombre" value="<%= usuario.nombre %>" readonly>
-</div>
+    <div>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" value="<%= usuario.nombre %>">
+    </div>
 
-<div>
-    <label for="email">Correo electrónico:</label>
-    <input type="email" id="email" name="email" value="<%= usuario.email %>" readonly>
-</div>
+    <div>
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" name="email" value="<%= usuario.email %>">
+    </div>
 
-<div>
-    <a href="/usuarios/gestionarCuenta" class="btn btn-gestionar-administrar">Gestionar datos cuenta</a>
-    <a href="/usuarios/cambiarContrasena" class="btn btn-gestionar-administrar">Cambiar contraseña</a>
-</div>
+    <div>
+        <label for="password">Nueva contraseña:</label>
+        <input type="password" id="password" name="password" placeholder="Introduzca si desea la nueva contraseña">
+    </div>
+
+    <div>
+        <label for="confirmPassword">Repetir nueva contraseña:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repite la nueva contraseña">
+    </div>
+
+    <button type="submit" class="btn">Guardar cambios</button>
+</form>
+
+<script>
+    function validarContrasenas() { //Si no coinciden no se manda
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            alert('Las contraseñas no coinciden. Por favor, verifica e inténtalo de nuevo.');
+            return false;
+        }
+
+        return true;
+    }
+</script>

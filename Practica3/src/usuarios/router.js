@@ -2,8 +2,8 @@ import express from 'express';
 import { 
     viewLogin, doLogin, doLogout, viewRegister, doRegister, 
     aniadirUsuario, viewAdd, viewEliminate, eliminateUser,
-    viewModify, doModify, administrarUsuarios, 
-    viewGestionarCuenta, viewActualizarCuenta, viewDatosUsuario
+    viewModify, doModify, administrarUsuarios, viewDatosUsuario,
+    actualizarCuenta
 } from './controllers.js';
 
 const usuariosRouter = express.Router();
@@ -21,8 +21,7 @@ usuariosRouter.get('/modifyUser', viewModify);
 usuariosRouter.post('/modifyUser', doModify);
 usuariosRouter.post('/delete', doModify);
 usuariosRouter.get('/administrarUsuarios', administrarUsuarios);
-usuariosRouter.get('/datos', viewDatosUsuario); 
-usuariosRouter.get('/gestionarCuenta', viewGestionarCuenta); 
-usuariosRouter.post('/actualizarCuenta', viewActualizarCuenta); 
+usuariosRouter.get('/datos', viewDatosUsuario);  
+usuariosRouter.post('/actualizarCuenta', actualizarCuenta); 
 
 export default usuariosRouter;

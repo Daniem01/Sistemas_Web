@@ -356,3 +356,52 @@ export function viewDatosUsuario(req, res) {
         });
     }
 }
+
+export function actualizarCuenta(req, res) {
+    try {
+        const { username, nombre, email, password, confirmPassword } = req.body;
+        const usuario = Usuario.getUsuarioByUsername(req.session.username);
+
+        if (username.trim() !== "" && username !== usuario.username) {
+            usuario.username = username;
+            req.session.username = username; 
+        }
+
+        if (nombre.trim() !== "" && nombre !== usuario.nombre) {
+            usuario.nombre = nombre;
+            req.session.nombre = nombre; n
+        }
+
+        if (email.trim() !== "" && email !== usuario.email) {
+            usuario.email = email;
+        }
+
+        if (password.trim() !== "") {
+            if (password === confirmPassword) {
+                usuario.password = password; 
+                return res.render('pagina', {
+                    contenido: 'paginas/datosUsuario',
+                    usuario,
+                    session: req.session,
+                    mensaje: 'Las contraseñas no coinciden. Por favor, inténtelo de nuevo.'
+                });
+            }
+        }
+
+        usuario.persist();
+
+        res.render('pagina', {
+            contenido: 'paginas/datosUsuario',
+            usuario,
+            session: req.session,
+            mensaje: 'Datos actualizados con éxito.'
+        });
+    } catch (error) {
+        res.render('pagina', {
+            contenido: 'paginas/datosUsuario',
+            usuario: null,
+            session: req.session,
+            mensaje: error.message
+        });
+    }
+}
